@@ -11,6 +11,8 @@ def get_input():
             print("Podana fraza jest za krótka.")
     return _search_phase
 
+def _get_path()-> str:
+        return input("Podaj poprawna sciezke: ").strip()
 
 def read_file(file_path : str) -> tuple[str,str]:
     """
@@ -18,15 +20,13 @@ def read_file(file_path : str) -> tuple[str,str]:
     :param file_path
     """
     _file_path = file_path.strip()
-    def _get_filepath()-> str:
-        return input("Podaj poprawna sciezke do pliku: ").strip()
-
+    
     while not os.path.isfile(_file_path) or not Path(_file_path).suffix.lower() in ALLOWED_EXTENSIONS:
         if not os.path.isfile(_file_path):
             print("To nie jest plik.")
         if not Path(_file_path).suffix.lower() in ALLOWED_EXTENSIONS:
             print(f"Plik musi posiadac rozszerzenie {ALLOWED_EXTENSIONS}.")
-        _file_path = _get_filepath()
+        _file_path = _get_path()
 
     with open(_file_path,'r',encoding='utf-8') as f:
         fc = f.read()
@@ -34,6 +34,9 @@ def read_file(file_path : str) -> tuple[str,str]:
 
 
 def find_in_text(searching_phrase: str, text: str)-> dict[str,int | dict[int,str]]:
+    """
+    Szuka frazy w tekscie i zwraca ilsoc wystapien
+    """
     result = {
         "count" : text.lower().count(searching_phrase.lower())
     }
@@ -49,17 +52,36 @@ def print_dict(data : dict) -> None:
     for k,v in data.items():
         print(f"{k}: {v}")
 
+def get_files(f_path : str | Path)-> list[Path]:
+
+    _f_path = Path(f_path)
+    while not os.path.isdir(_f_path):
+        _f_path = _get_path()
+ 
+    _dir_content = Path(_f_path).iterdir()
+    result = []
+    for item in _dir_content:
+        if os.path.isdir(item):
+            for i in get_files(item):
+                result.append(i)
+        elif os.path.isfile(item) and item.suffix.lower() in ALLOWED_EXTENSIONS:
+            result.append(item)
+    return result
+
 if __name__ == "__main__":
-    print("Witaj w DocFinder!")
-    phrase = get_input()
-    print(f"Szukasz {phrase}")
-    file_name = input("Podaj nazwe pliku: ")
-    f_content, file_name = read_file(file_name)
-    result = find_in_text(phrase, f_content)
-    occ_in_file = result.get("count")
-    if occ_in_file > 0:
-        found_lines = result.get("lines")
-        print(f"Szukana fraza wystepuje w pliku {occ_in_file} w liniach")
-        print_dict(found_lines)
-    else:
-        print("Brak szukanej frazy w pliku")
+    # print("Witaj w DocFinder!")
+    # phrase = get_input()
+    # print(f"Szukasz {phrase}")
+    # file_name = input("Podaj nazwe pliku: ")
+    # f_content, file_name = read_file(file_name)
+    # result = find_in_text(phrase, f_content)
+    # occ_in_file = result.get("count")
+    # if occ_in_file > 0:
+    #     found_lines = result.get("lines")
+    #     print(f"Szukana fraza wystepuje w pliku {occ_in_file} w liniach")
+    #     print_dict(found_lines)
+    # else:
+    #     print("Brak szukanej frazy w pliku")
+    print(get_files(input("Podaj: ")))
+
+
