@@ -14,12 +14,12 @@ def get_input():
 def _get_path()-> str:
         return input("Podaj poprawna sciezke: ").strip()
 
-def read_file(file_path : str) -> tuple[str,str]:
+def read_file(file_path : Path) -> tuple[str,Path]:
     """
     Odczytuje plik od podanej sciezce
     :param file_path
     """
-    _file_path = file_path.strip()
+    _file_path = Path(file_path)
     
     while not os.path.isfile(_file_path) or not Path(_file_path).suffix.lower() in ALLOWED_EXTENSIONS:
         if not os.path.isfile(_file_path):
@@ -68,20 +68,32 @@ def get_files(f_path : str | Path)-> list[Path]:
             result.append(item)
     return result
 
+def read_files(dir_path : str | Path, search_phrase : str):
+    dir_path = Path(dir_path)
+    _files_dir = get_files(dir_path)
+    _rfs_result = {}
+    for _file in _files_dir:
+        _fc, _ = read_file(_file)
+        _rfs_result[_file.name] = find_in_text(search_phrase, _fc)
+    return _rfs_result
+
+def print_result(result_data : dict) -> None:
+    for _fn, result in result_data.items():
+        _count = result.get("count")
+        if _count > 0:
+            print(f"Plik {_fn}")
+            print(f"Liczba wystapien {_count}")
+            for ln, ln_conent in result.get("lines").items():
+                print(f"    Linia {ln}: {ln_conent}")
+
+
 if __name__ == "__main__":
-    # print("Witaj w DocFinder!")
-    # phrase = get_input()
-    # print(f"Szukasz {phrase}")
-    # file_name = input("Podaj nazwe pliku: ")
-    # f_content, file_name = read_file(file_name)
-    # result = find_in_text(phrase, f_content)
-    # occ_in_file = result.get("count")
-    # if occ_in_file > 0:
-    #     found_lines = result.get("lines")
-    #     print(f"Szukana fraza wystepuje w pliku {occ_in_file} w liniach")
-    #     print_dict(found_lines)
-    # else:
-    #     print("Brak szukanej frazy w pliku")
-    print(get_files(input("Podaj: ")))
+    print("Witaj w DocFinder!")
+    phrase = get_input()
+    print(f"Szukasz {phrase}")
+
+    search_dir = input("Podaj nazwe folderu: ")
+    result_read_files = read_files(search_dir, phrase)
+    print_result(result_read_files)
 
 
