@@ -12,32 +12,35 @@ def get_input():
     return _search_phase
 
 
-def read_file(file_path : str) -> str:
+def read_file(file_path : str) -> tuple[str,str]:
     """
     Odczytuje plik od podanej sciezce
     :param file_path
     """
-    
-
-    file_path = file_path.strip()
+    _file_path = file_path.strip()
     def _get_filepath()-> str:
         return input("Podaj poprawna sciezke do pliku: ").strip()
 
-    while not os.path.isfile(file_path) or not Path(file_path).suffix.lower() in ALLOWED_EXTENSIONS:
-        if not os.path.isfile(file_path):
+    while not os.path.isfile(_file_path) or not Path(_file_path).suffix.lower() in ALLOWED_EXTENSIONS:
+        if not os.path.isfile(_file_path):
             print("To nie jest plik.")
-        if not Path(file_path).suffix.lower() in ALLOWED_EXTENSIONS:
+        if not Path(_file_path).suffix.lower() in ALLOWED_EXTENSIONS:
             print(f"Plik musi posiadac rozszerzenie {ALLOWED_EXTENSIONS}.")
-        file_path = _get_filepath()
+        _file_path = _get_filepath()
 
-    with open(file_path,'r',encoding='utf-8') as f:
+    with open(_file_path,'r',encoding='utf-8') as f:
         fc = f.read()
-        return fc
+        return fc , _file_path
+
 
 if __name__ == "__main__":
     print("Witaj w DocFinder!")
     phrase = get_input()
     print(f"Szukasz {phrase}")
     file_name = input("Podaj nazwe pliku: ")
-    f_content = read_file(file_name)
-    print(f_content)
+    f_content, file_name = read_file(file_name)
+
+    if phrase.lower() in f_content.lower():
+        print(f"Szukana fraza {phrase} znajduje sie w pliku {file_name}")
+    else:
+        print(f"Brak szukanej frazy w pliku {file_name}")
