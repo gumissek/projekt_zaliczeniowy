@@ -11,8 +11,8 @@ def get_input():
             print("Podana fraza jest za krótka.")
     return _search_phase
 
-def _get_path()-> str:
-        return input("Podaj poprawna sciezke: ").strip()
+def _get_path()-> Path:
+        return Path(input("Podaj poprawna sciezke: ").strip())
 
 def read_file(file_path : Path) -> tuple[str,Path]:
     """
@@ -74,17 +74,21 @@ def read_files(dir_path : str | Path, search_phrase : str):
     _rfs_result = {}
     for _file in _files_dir:
         _fc, _ = read_file(_file)
-        _rfs_result[_file.name] = find_in_text(search_phrase, _fc)
+        _rfs_result[_file] = find_in_text(search_phrase, _fc)
     return _rfs_result
 
 def print_result(result_data : dict) -> None:
+    is_any_found = False
     for _fn, result in result_data.items():
         _count = result.get("count")
         if _count > 0:
+            is_any_found = True
             print(f"Plik {_fn}")
             print(f"Liczba wystapien {_count}")
             for ln, ln_conent in result.get("lines").items():
                 print(f"    Linia {ln}: {ln_conent}")
+    if not is_any_found:
+        print("Nie znaleziono frazy")
 
 
 if __name__ == "__main__":
