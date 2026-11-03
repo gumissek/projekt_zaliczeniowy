@@ -1,8 +1,11 @@
-def find_in_text(searching_phrase: str, text: str)-> dict[str,int | dict[int,str]]:
+from pathlib import Path
+from docfinder.types import SearchResult
+
+def find_in_text(searching_phrase: str, text: str)-> SearchResult:
     """
     Szuka frazy w tekscie i zwraca ilsoc wystapien
     """
-    result = {
+    result : SearchResult = {
         "count" : text.lower().count(searching_phrase.lower())
     }
     if searching_phrase.lower() in text.lower():

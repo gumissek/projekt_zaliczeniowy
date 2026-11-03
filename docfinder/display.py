@@ -1,6 +1,10 @@
-def print_result(result_data : dict) -> None:
+from docfinder.results_iterator import ResultsIterator
+from docfinder.types import SearchResult
+from pathlib import Path
+
+def print_result(result_data : dict[Path, SearchResult]) -> None:
     is_any_found = False
-    for _fn, result in result_data.items():
+    for _fn, result in ResultsIterator(result_data):
         _count = result.get("count")
         if _count > 0:
             is_any_found = True
