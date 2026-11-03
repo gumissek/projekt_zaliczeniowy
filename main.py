@@ -52,29 +52,34 @@ def print_dict(data : dict) -> None:
     for k,v in data.items():
         print(f"{k}: {v}")
 
-def get_files(f_path : str | Path)-> list[Path]:
-
+def get_files_from_folder(f_path : str | Path)-> list[Path]:
     _f_path = Path(f_path)
     while not os.path.isdir(_f_path):
         _f_path = _get_path()
  
     _dir_content = Path(_f_path).iterdir()
     result = []
-    for item in _dir_content:
-        if os.path.isdir(item):
-            for i in get_files(item):
-                result.append(i)
-        elif os.path.isfile(item) and item.suffix.lower() in ALLOWED_EXTENSIONS:
-            result.append(item)
+    try:
+        for item in _dir_content:
+            if os.path.isdir(item):
+                for i in get_files_from_folder(item):
+                    result.append(i)
+            elif os.path.isfile(item) and item.suffix.lower() in ALLOWED_EXTENSIONS:
+                result.append(item)
+    except OSError as _error:
+        print(f"Blad dostepu do sciezki {_f_path} - {_error}")
     return result
 
 def read_files(dir_path : str | Path, search_phrase : str):
     dir_path = Path(dir_path)
-    _files_dir = get_files(dir_path)
+    _files_dir = get_files_from_folder(dir_path)
     _rfs_result = {}
     for _file in _files_dir:
-        _fc, _ = read_file(_file)
-        _rfs_result[_file] = find_in_text(search_phrase, _fc)
+        try:
+            _fc, _ = read_file(_file)
+            _rfs_result[_file] = find_in_text(search_phrase, _fc)
+        except (OSError, UnicodeDecodeError) as error:
+            print(f"Blad obslugi pliku {_file} - {error}")
     return _rfs_result
 
 def print_result(result_data : dict) -> None:
