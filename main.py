@@ -57,7 +57,12 @@ def get_files_from_folder(f_path : str | Path)-> list[Path]:
     while not os.path.isdir(_f_path):
         _f_path = _get_path()
  
-    _dir_content = Path(_f_path).iterdir()
+    try:
+        _dir_content = Path(_f_path).iterdir()
+    except OSError as _err:
+        print(f"Blad odczytu folderu {_f_path} - {_err}")
+        _dir_content = []
+    
     result = []
     try:
         for item in _dir_content:
