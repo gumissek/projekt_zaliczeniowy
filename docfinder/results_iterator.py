@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Self
-from docfinder.types import SearchResult
+from docfinder.models import SearchResult
 
 class ResultsIterator:
     def __init__(

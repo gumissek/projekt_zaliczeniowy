@@ -1,5 +1,5 @@
 from pathlib import Path
-from docfinder.types import SearchResult
+from docfinder.models import SearchResult
 
 def find_in_text(searching_phrase: str, text: str)-> SearchResult:
     """

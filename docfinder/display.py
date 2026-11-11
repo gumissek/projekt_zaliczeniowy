@@ -1,5 +1,5 @@
 from docfinder.results_iterator import ResultsIterator
-from docfinder.types import SearchResult
+from docfinder.models import SearchResult
 from pathlib import Path
 
 def print_result(result_data : dict[Path, SearchResult]) -> None:
