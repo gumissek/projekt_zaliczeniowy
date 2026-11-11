@@ -6,9 +6,23 @@ from docfinder.concurrent_reader import read_concurrent_files
 from docfinder.models import SearchResult
 from docfinder.config import SearchConfig
 from docfinder.files import _get_path
+from docfinder.index import build_index, get_from_index
+
 
 @measure_time
-def read_files(dir_path : str | Path, search_phrase : str) -> dict[Path, SearchResult]:
+def read_files(file_contents : list[tuple[str,Path]], index : dict[str, set[Path]],  search_phrase : str) -> dict[Path, SearchResult]:
+
+    result_index_for_word = get_from_index(index, search_phrase)
+    print(f"Pliki znalezione w indeksie: {result_index_for_word}")
+    _rfs_result = {
+        file_path: find_in_text(search_phrase, content)
+        for content, file_path in file_contents
+    }
+
+    return _rfs_result
+
+
+def prepare_documents(dir_path : str | Path)-> tuple[list[tuple[str,Path]], dict[str, set[Path]]]:
     while True:
         try:
             config = SearchConfig(path=dir_path)
@@ -20,10 +34,6 @@ def read_files(dir_path : str | Path, search_phrase : str) -> dict[Path, SearchR
     file_paths = config.get_files()
 
     file_contents = read_concurrent_files(file_paths)
-
-    _rfs_result ={
-        file_path: find_in_text(search_phrase, content)
-        for content, file_path in file_contents
-    }
-
-    return _rfs_result
+    index = build_index(file_contents)
+    print("Zbudowano index i zawartosc plików!")
+    return file_contents, index
