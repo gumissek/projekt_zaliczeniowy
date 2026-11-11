@@ -47,3 +47,19 @@ def find_in_text(searching_phrase: str, text: str)-> SearchResult:
         result["lines"] = dict(pary)
         result["sections"] = get_heading_and_title(text)
     return result
+
+def find_word_in_text(word: str, text: str) -> SearchResult:
+    if not re.fullmatch(r"\w+", word):
+        raise ValueError("Wpisz jedno słowo zawierające litery lub cyfry ")
+
+    pattern = re.compile(r"\b" + re.escape(word.lower()) + r"\b")
+    lines = {
+        number: line
+        for number, line in enumerate(text.splitlines(), start=1) if pattern.search(line.lower())
+    }
+    count = sum(1 for _ in pattern.finditer(text.lower()))
+    result: SearchResult = {"count": count, "whole_word_count": count}
+    if count:
+        result["lines"] = lines
+        result["sections"] = get_heading_and_title(text)
+    return result

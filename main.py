@@ -17,9 +17,22 @@ def print_welcome() -> None:
     print("Witaj w DocFinder!")
     print("Autor: Piotr Biliński nr albumu 112798")
 
+def get_search_mode()-> str:
+    print("Wybór trybu wyszukiwania:")
+    print("    Wybierz 1: fragment lub fraza")
+    print("    Wybierz 2: całe słowo przez indeks")
+    while True:
+        mode = input("Wybierz tryb: ")
+        if mode not in ["1", "2"]:
+            print("Niepoprawny tryb.")
+        else:
+            break
+    return mode 
+
 if __name__ == "__main__":
     print_welcome()
     is_on = True
+    search_mode = get_search_mode()
     search_dir = input("Podaj nazwe folderu: ")
     f_contents, index = prepare_documents(search_dir)
     while is_on:
@@ -27,7 +40,11 @@ if __name__ == "__main__":
         if phrase.lower() == "quit":
             break
         print(f"Szukasz: {phrase}")
-        result_read_files = read_files(f_contents,index, phrase)
+        try:
+            result_read_files = read_files(phrase, search_mode, f_contents, index)
+        except ValueError as error:
+            print(error)
+            continue
         print_result(result_read_files)
 
     print("Dziękuje za skorzystanie z DocFinder!")

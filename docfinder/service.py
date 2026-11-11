@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from docfinder.search import find_in_text
+from docfinder.search import find_in_text, find_word_in_text
 from docfinder.decorators import measure_time
 from docfinder.concurrent_reader import read_concurrent_files
 from docfinder.models import SearchResult
@@ -10,16 +10,21 @@ from docfinder.index import build_index, get_from_index
 
 
 @measure_time
-def read_files(file_contents : list[tuple[str,Path]], index : dict[str, set[Path]],  search_phrase : str) -> dict[Path, SearchResult]:
-
-    result_index_for_word = get_from_index(index, search_phrase)
-    print(f"Pliki znalezione w indeksie: {result_index_for_word}")
-    _rfs_result = {
-        file_path: find_in_text(search_phrase, content)
-        for content, file_path in file_contents
-    }
-
-    return _rfs_result
+def read_files(search_phrase : str, search_mode : str , file_contents : list[tuple[str,Path]], index : dict[str, set[Path]]) -> dict[Path, SearchResult]:
+    if search_mode == "1":
+        return {
+            file_path: find_in_text(search_phrase, content)
+            for content, file_path in file_contents
+        }
+    if search_mode == "2":
+        find_word_in_text(search_phrase, "")
+        matching_paths = get_from_index(index, search_phrase)
+        return {
+            file_path: find_word_in_text(search_phrase, content)
+            for content, file_path in file_contents
+            if file_path in matching_paths
+        }
+    raise ValueError("Niepoprawny tryb wyszukiwania.")
 
 
 def prepare_documents(dir_path : str | Path)-> tuple[list[tuple[str,Path]], dict[str, set[Path]]]:
