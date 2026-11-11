@@ -3,8 +3,7 @@ from typing import Self
 from docfinder.models import SearchResult
 
 class ResultsIterator:
-    def __init__(
-        self, result_dict: dict[Path, SearchResult]) -> None:
+    def __init__(self, result_dict: dict[Path, SearchResult]) -> None:
         self.items_iterator = iter(result_dict.items())
 
     def __iter__(self) -> Self:

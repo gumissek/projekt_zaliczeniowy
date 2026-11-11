@@ -14,5 +14,10 @@ def measure_time(func):
         return result
     return wrapper
 
-    
-    
+def folder_required(method):
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        if not self.folder.is_dir():
+            raise ValueError(f"Folder nie istnieje: {self.folder}")
+        return method(self, *args, **kwargs)
+    return wrapper

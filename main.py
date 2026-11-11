@@ -1,7 +1,9 @@
+from docfinder.files import _get_path
 from pathlib import Path
 from docfinder.search import find_in_text
-from docfinder.files import read_file, iter_files
+from docfinder.files import read_file
 from docfinder.display import print_result
+from docfinder.config import SearchConfig
 
 def get_input():
     _search_phase = None
@@ -16,9 +18,17 @@ def print_dict(data : dict) -> None:
         print(f"{k}: {v}")
 
 def read_files(dir_path : str | Path, search_phrase : str):
-    dir_path = Path(dir_path)
+
+    while True:
+        try:
+            config = SearchConfig(path=dir_path)
+            break
+        except ValueError as error:
+            print(error)
+            dir_path = _get_path()
+
     _rfs_result = {}
-    for _file in iter_files(dir_path):
+    for _file in config.get_files():
         try:
             _fc, _ = read_file(_file)
             _rfs_result[_file] = find_in_text(search_phrase, _fc)
