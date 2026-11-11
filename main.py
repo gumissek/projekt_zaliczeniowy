@@ -12,6 +12,7 @@ def get_input():
 
 if __name__ == "__main__":
     print("Witaj w DocFinder!")
+    print("Autor: Piotr Biliński nr albumu 112798")
     phrase = get_input()
     print(f"Szukasz {phrase}")
 

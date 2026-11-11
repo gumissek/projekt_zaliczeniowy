@@ -10,10 +10,11 @@ def print_result(result_data : dict[Path, SearchResult]) -> None:
         if _count > 0:
             is_any_found = True
             print(f"Plik {_fn}")
-            print(f"Liczba wystapien {_count}")
-            print(f"Liczba znalezionych pełnych słów {_whole_word_count}")
+            print(f"    Liczba wystapien {_count}")
+            print(f"    Liczba znalezionych pełnych słów {_whole_word_count}")
+            print(f"    Linie wystapien:")
             for ln, ln_conent in result.get("lines").items():
                 section = result.get("sections").get(ln)
-                print(f"    Linia {ln}{f", sekcja {section}" if section is not None else ""}: {ln_conent}" )
+                print(f"        Linia {ln}{f", sekcja {section}" if section is not None else ""}: {ln_conent}" )
     if not is_any_found:
         print("Nie znaleziono frazy")
