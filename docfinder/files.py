@@ -1,12 +1,14 @@
 from pathlib import Path
 from collections.abc import Iterator
 import os
+from docfinder.decorators import retry
 
 ALLOWED_EXTENSIONS = {".md", ".txt"}
 
 def _get_path()-> Path:
         return Path(input("Podaj poprawna sciezke: ").strip())
 
+@retry(attempts=3)
 def read_file(file_path : Path) -> tuple[str,Path]:
     """
     Odczytuje plik od podanej sciezce

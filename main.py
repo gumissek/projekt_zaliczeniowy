@@ -4,6 +4,7 @@ from docfinder.search import find_in_text
 from docfinder.files import read_file
 from docfinder.display import print_result
 from docfinder.config import SearchConfig
+from docfinder.decorators import measure_time
 
 def get_input():
     _search_phase = None
@@ -17,6 +18,7 @@ def print_dict(data : dict) -> None:
     for k,v in data.items():
         print(f"{k}: {v}")
 
+@measure_time
 def read_files(dir_path : str | Path, search_phrase : str):
 
     while True:
