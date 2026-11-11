@@ -14,18 +14,9 @@ def read_file(file_path : Path) -> tuple[str,Path]:
     Odczytuje plik od podanej sciezce
     :param file_path
     """
-    _file_path = Path(file_path)
-    
-    while not os.path.isfile(_file_path) or not Path(_file_path).suffix.lower() in ALLOWED_EXTENSIONS:
-        if not os.path.isfile(_file_path):
-            print("To nie jest plik.")
-        if not Path(_file_path).suffix.lower() in ALLOWED_EXTENSIONS:
-            print(f"Plik musi posiadac rozszerzenie {ALLOWED_EXTENSIONS}.")
-        _file_path = _get_path()
-
-    with open(_file_path,'r',encoding='utf-8') as f:
-        fc = f.read()
-        return fc , _file_path
+    with open(file_path,'r',encoding='utf-8') as f:
+        content = f.read()
+        return content , file_path
 
 
 def get_files_from_folder(f_path : str | Path)-> list[Path]:
