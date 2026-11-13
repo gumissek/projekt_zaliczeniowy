@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-
+from concurrent.futures import ProcessPoolExecutor
 
 
 def extract_words(text : str) -> set[str]:
@@ -14,11 +14,14 @@ def extract_words(text : str) -> set[str]:
 
 def build_index(result_read_concurrent_files : list[tuple[str, Path]]) -> dict[str, set[Path]]:
     index = {}
-    for text, path in result_read_concurrent_files:
-        for word in extract_words(text):
-            if word not in index:
-                index[word] = set()
-            index[word].add(path)
+    texts = (text for text, path in result_read_concurrent_files)
+    with ProcessPoolExecutor(max_workers=8) as p_executor:
+        word_sets = p_executor.map(extract_words,texts)
+        for (_, path), words in zip(result_read_concurrent_files, word_sets):
+            for word in words:
+                if word not in index:
+                    index[word] = set()
+                index[word].add(path)
     return index
 
 
