@@ -8,9 +8,9 @@ from docfinder.files import iter_files
 
 class SearchConfig:
     """Przechowuje i sprawdza folder używany do wyszukiwania."""
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: str | Path) -> None:
         """Tworzy konfigurację dla wskazanego folderu."""
-        self.folder = Path(path)
+        self.folder = path
 
     @property
     def folder(self) -> Path:
@@ -20,6 +20,8 @@ class SearchConfig:
     @folder.setter
     def folder(self, folder_path : str | Path) -> None:
         """Ustawia istniejący folder lub zgłasza ValueError."""
+        if isinstance(folder_path, str) and not folder_path.strip():
+            raise ValueError("Ścieżka folderu nie może być pusta.")
         __folder = Path(folder_path)
         if not __folder.is_dir():
             raise ValueError(f"To nie jest folder: {__folder}")

@@ -9,8 +9,12 @@ logger = logging.getLogger(__name__)
 ALLOWED_EXTENSIONS = {".md", ".txt"}
 
 def _get_path()-> Path:
-        """Pobiera od użytkownika ścieżkę i zwraca ją jako Path."""
-        return Path(input("Podaj poprawna sciezke: ").strip())
+    """Pobiera od użytkownika niepustą ścieżkę i zwraca ją jako Path."""
+    while True:
+        path = input("Podaj poprawna sciezke: ").strip()
+        if path:
+            return Path(path)
+        logger.warning("Ścieżka folderu nie może być pusta.")
 
 @retry(attempts=3)
 def read_file(file_path : Path) -> tuple[str,Path]:
