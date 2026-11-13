@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 @measure_time
 def read_files(search_phrase : str, search_mode : str , file_contents : list[tuple[str,Path]], index : dict[str, set[Path]]) -> dict[Path, SearchResult]:
+    """Wyszukuje frazę lub całe słowo w odczytanych dokumentach. W trybie 2 korzysta z indeksu."""
     if search_mode == "1":
         return {
             file_path: find_in_text(search_phrase, content)
@@ -30,6 +31,7 @@ def read_files(search_phrase : str, search_mode : str , file_contents : list[tup
 
 
 def prepare_documents(dir_path : str | Path)-> tuple[list[tuple[str,Path]], dict[str, set[Path]]]:
+    """Sprawdza folder, odczytuje dokumenty i zwraca ich zawartość wraz z indeksem."""
     while True:
         try:
             config = SearchConfig(path=dir_path)

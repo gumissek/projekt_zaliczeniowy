@@ -4,12 +4,14 @@ import re
 
 NAGLOWEK_PATTERN = r"^(?P<level>#{1,6})\s+(?P<title>.+)$"
 
-def find_whole_word(word: str, text: str):
+def find_whole_word(word: str, text: str) -> int:
+    """Liczy wystąpienia całego słowa bez rozróżniania wielkości liter."""
     pattern = r"\b" + re.escape(word) + r"\b"
     matches = re.finditer(pattern, text, re.IGNORECASE)
     return sum(1 for match in matches)
 
 def parse_heading(line:str) -> RegexHeadingResult | None:
+    """Rozpoznaje nagłówek Markdown i zwraca jego poziom i tytuł albo None."""
     match = re.match(NAGLOWEK_PATTERN, line)
     if not match:
         return None
@@ -20,6 +22,7 @@ def parse_heading(line:str) -> RegexHeadingResult | None:
 
 
 def get_heading_and_title(text: str) -> dict[int, str | None]:
+    """Przypisuje każdemu numerowi linii tytuł ostatniego nagłówka lub None."""
     current_heading = None
     sections = {}
     for index,ln in enumerate(text.splitlines(),start=1 ):
@@ -34,9 +37,7 @@ def get_heading_and_title(text: str) -> dict[int, str | None]:
         
 
 def find_in_text(searching_phrase: str, text: str)-> SearchResult:
-    """
-    Szuka frazy w tekscie i zwraca ilsoc wystapien
-    """
+    """Wyszukuje frazę bez rozróżniania wielkości liter i zwraca liczby oraz szczegóły dopasowań."""
     result : SearchResult = {
         "count" : text.lower().count(searching_phrase.lower()),
         "whole_word_count" : find_whole_word(searching_phrase, text)
@@ -49,6 +50,7 @@ def find_in_text(searching_phrase: str, text: str)-> SearchResult:
     return result
 
 def find_word_in_text(word: str, text: str) -> SearchResult:
+    """Wyszukuje całe słowo w tekście. Zgłasza ValueError, jeśli zapytanie nie jest pojedynczym słowem."""
     if not re.fullmatch(r"\w+", word):
         raise ValueError("Wpisz jedno słowo zawierające litery lub cyfry ")
 

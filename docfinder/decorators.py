@@ -10,12 +10,11 @@ KODY_BLEDOW_WZNOWIEN = {errno.EINTR, errno.EAGAIN, errno.ETIMEDOUT}
 
 logger = logging.getLogger(__name__)
 
-def measure_time(func):
-    """
-    Dekorator do mierzenia czasu wykonania funkcji
-    """
+def measure_time(func) -> None:
+    """Dekoruje funkcję, logując czas jej poprawnego wykonania."""
     @functools.wraps(func)
     def wrapper(*args,**kwargs):
+        """Wywołuje funkcję, mierzy jej czas i zwraca jej wynik."""
         start = time.perf_counter()
         result = func(*args,**kwargs)
         elapsed = time.perf_counter() - start
@@ -24,8 +23,10 @@ def measure_time(func):
     return wrapper
 
 def folder_required(method):
+    """Sprawdza istnienie folderu obiektu przed wywołaniem dekorowanej metody."""
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
+        """Sprawdza folder i wywołuje metodę lub zgłasza ValueError."""
         if not self.folder.is_dir():
             raise ValueError(f"Folder nie istnieje: {self.folder}")
         return method(self, *args, **kwargs)
@@ -33,11 +34,13 @@ def folder_required(method):
 
 
 def retry(attempts:int = 3 ):
+    """Ponawia wywołanie funkcji po wybranych tymczasowych błędach I/O. Liczbę prób określa parametr attempts."""
     if attempts < 1:
         raise ValueError(f"Za mala liczba prob {attempts}")
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args,**kwargs):
+            """Wywołuje funkcję ponownie po obsługiwanym błędzie, do wyczerpania prób."""
             for att in range(1, attempts+1):
                 try:
                     return func(*args, **kwargs)

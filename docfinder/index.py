@@ -4,6 +4,7 @@ from concurrent.futures import ProcessPoolExecutor
 
 
 def extract_words(text : str) -> set[str]:
+    """Zwraca zbiór słów zapisanych małymi literami. Zgłasza ValueError, jeśli tekst nie jest ciągiem znaków."""
     if not isinstance(text,str):
         raise ValueError
     _text = text.lower()
@@ -13,6 +14,7 @@ def extract_words(text : str) -> set[str]:
 
 
 def build_index(result_read_concurrent_files : list[tuple[str, Path]]) -> dict[str, set[Path]]:
+    """Buduje indeks przypisujący słowom ścieżki dokumentów. Analizuje teksty w procesach."""
     index = {}
     texts = (text for text, path in result_read_concurrent_files)
     with ProcessPoolExecutor(max_workers=8) as p_executor:
@@ -26,6 +28,7 @@ def build_index(result_read_concurrent_files : list[tuple[str, Path]]) -> dict[s
 
 
 def get_from_index(index :dict[str, set[Path]] , word : str) -> set[Path]:
+    """Zwraca ścieżki zawierające słowo lub pusty zbiór, ignorując wielkość liter."""
     _word = word.lower()
     return index.get(_word, set())
 

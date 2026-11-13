@@ -3,6 +3,7 @@ from docfinder.models import SearchResult
 from pathlib import Path
 
 def print_result(result_data : dict[Path, SearchResult]) -> None:
+    """Wyświetla wyniki dla plików lub informację o braku dopasowań."""
     is_any_found = False
     for _fn, result in ResultsIterator(result_data):
         _count = result.get("count")

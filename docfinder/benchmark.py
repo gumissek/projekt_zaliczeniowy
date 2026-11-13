@@ -37,6 +37,7 @@ benchmark_texts = [(text + " ") * 1000 for text in EXAMPLE_TEXTS] * 100
 
 @measure_time
 def analyze_sequential(texts: list[str]) -> list[set[str]]:
+    """Zwraca zbiory słów z tekstów analizowanych sekwencyjnie."""
     if not texts:
         return []
 
@@ -49,6 +50,7 @@ def analyze_sequential(texts: list[str]) -> list[set[str]]:
 
 @measure_time
 def analyze_threaded(texts: list[str], workers: int = 4) -> list[set[str]]:
+    """Zwraca zbiory słów z tekstów analizowanych w puli wątków."""
     if not texts:
         return []
 
@@ -61,6 +63,7 @@ def analyze_threaded(texts: list[str], workers: int = 4) -> list[set[str]]:
 
 @measure_time
 def analyze_processes(texts: list[str], workers: int = 4) -> list[set[str]]:
+    """Zwraca zbiory słów z tekstów analizowanych w puli procesów."""
     if not texts:
         return []
 
@@ -73,6 +76,7 @@ def analyze_processes(texts: list[str], workers: int = 4) -> list[set[str]]:
 
 
 def run_benchmark(texts : list[str] ,runs : int = 3, workers: int = 4 ) -> None:
+    """Uruchamia wskazaną liczbę porównań i wyświetla zgodność wyników."""
     print(f"Benchmark - wydajnosciowy - workers: {workers}")
     overall_results = {}
     for run in range(1, runs + 1):
