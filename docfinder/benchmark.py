@@ -26,6 +26,12 @@ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from docfinder.decorators import measure_time
 import asyncio
 import logging
+import time
+from collections.abc import Callable
+from pathlib import Path
+from uuid import uuid4
+from docfinder.chart import save_chart
+import datetime
 
 EXAMPLE_TEXTS = [
     "Python jest językiem programowania. Python służy do analizy danych.",
@@ -36,6 +42,13 @@ EXAMPLE_TEXTS = [
 ]
 
 benchmark_texts = [(text + " ") * 1000 for text in EXAMPLE_TEXTS] * 100
+
+def measure_analysis(analysis: Callable[[], list[set[str]]]) -> tuple[list[set[str]], float]:
+    """Uruchamia analizę i zwraca jej wynik oraz czas w sekundach."""
+    start = time.perf_counter()
+    result = analysis()
+    elapsed = time.perf_counter() - start
+    return result, elapsed
 
 @measure_time
 def analyze_sequential(texts: list[str]) -> list[set[str]]:
@@ -98,18 +111,32 @@ def run_benchmark(texts : list[str] ,runs : int = 3, workers: int = 4 ) -> None:
     """Uruchamia wskazaną liczbę porównań i wyświetla zgodność wyników."""
     print(f"Benchmark - wydajnosciowy - workers: {workers}")
     overall_results = {}
+    output_dir = Path("benchmark_results")
+    output_dir.mkdir(exist_ok=True)
+    series_id = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+ "_" + uuid4().hex[:8]
+
     for run in range(1, runs + 1):
         print(f"    {run}# Analiza - sekwencyjna")
-        result_sequential = analyze_sequential(texts)
+        result_sequential, time_sequential = measure_analysis(lambda: analyze_sequential(texts))
         print(f"    {run}# Analiza - w watkach")
-        result_threaded = analyze_threaded(texts, workers)
+        result_threaded, time_threaded = measure_analysis(lambda: analyze_threaded(texts, workers))
         print(f"    {run}# Analiza - w procesach")
-        result_processes = analyze_processes(texts, workers)
+        result_processes, time_processes = measure_analysis(lambda: analyze_processes(texts, workers))
         print(f"    {run}# Analiza - asyncio")
-        result_asyncio = analyze_asyncio(texts)
+        result_asyncio, time_asyncio = measure_analysis(lambda: analyze_asyncio(texts))
         run_equal = result_sequential == result_threaded == result_processes == result_asyncio
         print(f"Run {run}# Czy wyniki takie same? {run_equal}")
         overall_results[run] = run_equal
+        times = {
+            "Sekwencyjnie": time_sequential,
+            "Watki": time_threaded,
+            "Procesy": time_processes,
+            "Asyncio": time_asyncio,
+        }
+        output_path = output_dir / f"{series_id}_workers_{workers}_run_{run}.png"
+        save_chart(times, workers, run, output_path)
+        print(f"Zapisano wykres: {output_path}")
+        
     print(f"Całościowe wyniki dla {runs} przebiegów:")
     for k, v in overall_results.items():
         print(F"    Przebieg {k} - wynik {v}")
