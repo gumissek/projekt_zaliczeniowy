@@ -24,6 +24,8 @@ od liczby pracowników. Wynik zależy od komputera, danych i rozmiaru zadania. D
 from docfinder.index import extract_words
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from docfinder.decorators import measure_time
+import asyncio
+import logging
 
 EXAMPLE_TEXTS = [
     "Python jest językiem programowania. Python służy do analizy danych.",
@@ -74,6 +76,23 @@ def analyze_processes(texts: list[str], workers: int = 4) -> list[set[str]]:
         results = p_executor.map(extract_words,texts)
         return list(results)
 
+@measure_time
+def analyze_asyncio(texts: list[str]) -> list[set[str]]:
+    """Analizuje teksty za pomocą asyncio."""
+
+    async def analyze_one(text: str) -> set[str]:
+        return extract_words(text)
+
+    async def analyze_all() -> list[set[str]]:
+        return await asyncio.gather(
+            *(analyze_one(text) for text in texts)
+        )
+
+    if not all(isinstance(text, str) for text in texts):
+        raise ValueError
+
+    return asyncio.run(analyze_all())
+
 
 def run_benchmark(texts : list[str] ,runs : int = 3, workers: int = 4 ) -> None:
     """Uruchamia wskazaną liczbę porównań i wyświetla zgodność wyników."""
@@ -86,7 +105,9 @@ def run_benchmark(texts : list[str] ,runs : int = 3, workers: int = 4 ) -> None:
         result_threaded = analyze_threaded(texts, workers)
         print(f"    {run}# Analiza - w procesach")
         result_processes = analyze_processes(texts, workers)
-        run_equal = result_sequential == result_threaded == result_processes
+        print(f"    {run}# Analiza - asyncio")
+        result_asyncio = analyze_asyncio(texts)
+        run_equal = result_sequential == result_threaded == result_processes == result_asyncio
         print(f"Run {run}# Czy wyniki takie same? {run_equal}")
         overall_results[run] = run_equal
     print(f"Całościowe wyniki dla {runs} przebiegów:")
@@ -94,6 +115,10 @@ def run_benchmark(texts : list[str] ,runs : int = 3, workers: int = 4 ) -> None:
         print(F"    Przebieg {k} - wynik {v}")
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(levelname)s | %(name)s | %(message)s",
+    )
     workers = [4,8,16]
     for w in workers:
         run_benchmark(texts=benchmark_texts, runs=5, workers=w)
