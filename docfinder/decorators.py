@@ -1,12 +1,14 @@
 import functools
 import time
 import errno
+import logging
 
 KODY_BLEDOW_WZNOWIEN = {errno.EINTR, errno.EAGAIN, errno.ETIMEDOUT}
 # EINTR - Operacja została przerwana.
 # EAGAIN - Zasób jest chwilowo niedostępny albo operacji nie można teraz ukończyć.
 # ETIMEDOUT - Operacja przekroczyła limit czasu.
 
+logger = logging.getLogger(__name__)
 
 def measure_time(func):
     """
@@ -17,7 +19,7 @@ def measure_time(func):
         start = time.perf_counter()
         result = func(*args,**kwargs)
         elapsed = time.perf_counter() - start
-        print(f"Wykonano funkcje {func.__name__} w {elapsed:.4f} s")
+        logger.info(f"Wykonano funkcje {func.__name__} w {elapsed:.4f} s")
         return result
     return wrapper
 
@@ -42,7 +44,7 @@ def retry(attempts:int = 3 ):
                 except OSError as oserr:
                     if oserr.errno not in KODY_BLEDOW_WZNOWIEN:
                         raise
-                    print(f"Blad {oserr} / {att}")
+                    logger.warning("Błąd %s, próba %s z %s", oserr, att, attempts)
                     if att == attempts:
                         raise
         return wrapper

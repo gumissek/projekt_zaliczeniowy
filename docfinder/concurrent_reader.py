@@ -3,7 +3,9 @@ from collections.abc import Iterable
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 from docfinder.files import read_file
+import logging
 
+logger = logging.getLogger(__name__)
 class ReadCounter:
     def __init__(self):
         # lock
@@ -69,10 +71,10 @@ def read_concurrent_files(path_list : Iterable[Path]) -> list[tuple[str,Path]]:
                 _result = future.result()
                 results.append(_result)
             except (OSError, UnicodeDecodeError) as _err:
-                print(f"Blad obslugi pliku {path} - {_err}")
+                logger.warning(f"Blad obslugi pliku {path} - {_err}")
 
-    print(f"Odczytano poprawnie {counter.counter} plików.")
-    print(f"    Sciezki odczytanych plikow: {counter.correct_paths}")
+    logger.info(f"Odczytano poprawnie {counter.counter} plików.")
+    logger.info(f"Sciezki odczytanych plikow: {counter.correct_paths}")
     return results
 
 

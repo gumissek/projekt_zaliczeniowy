@@ -2,6 +2,9 @@ from pathlib import Path
 from collections.abc import Iterator
 import os
 from docfinder.decorators import retry
+import logging
+
+logger = logging.getLogger(__name__)
 
 ALLOWED_EXTENSIONS = {".md", ".txt"}
 
@@ -34,7 +37,7 @@ def get_files_from_folder(f_path : str | Path)-> list[Path]:
             elif os.path.isfile(item) and item.suffix.lower() in ALLOWED_EXTENSIONS:
                 result.append(item)
     except OSError as _error:
-        print(f"Blad dostepu do sciezki {_f_path} - {_error}")
+        logger.warning(f"Blad dostepu do sciezki {_f_path} - {_error}")
     return result
 
 
@@ -52,4 +55,4 @@ def iter_files(folder_path : Path) -> Iterator[Path]:
                 # generator
                 yield from iter_files(item)
     except OSError as _err:
-        print(f"Blad dostepu do {_folder_path} - {_err}")
+        logger.warning(f"Blad dostepu do {_folder_path} - {_err}")

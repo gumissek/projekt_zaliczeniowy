@@ -7,7 +7,9 @@ from docfinder.models import SearchResult
 from docfinder.config import SearchConfig
 from docfinder.files import _get_path
 from docfinder.index import build_index, get_from_index
+import logging
 
+logger = logging.getLogger(__name__)
 
 @measure_time
 def read_files(search_phrase : str, search_mode : str , file_contents : list[tuple[str,Path]], index : dict[str, set[Path]]) -> dict[Path, SearchResult]:
@@ -33,12 +35,12 @@ def prepare_documents(dir_path : str | Path)-> tuple[list[tuple[str,Path]], dict
             config = SearchConfig(path=dir_path)
             break
         except ValueError as error:
-            print(error)
+            logger.warning(error)
             dir_path = _get_path()
 
     file_paths = config.get_files()
 
     file_contents = read_concurrent_files(file_paths)
     index = build_index(file_contents)
-    print("Zbudowano index i zawartosc plików!")
+    logger.info("Zbudowano index i zawartosc plików!")
     return file_contents, index
