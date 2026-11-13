@@ -10,7 +10,7 @@ KODY_BLEDOW_WZNOWIEN = {errno.EINTR, errno.EAGAIN, errno.ETIMEDOUT}
 
 logger = logging.getLogger(__name__)
 
-def measure_time(func) -> None:
+def measure_time(func):
     """Dekoruje funkcję, logując czas jej poprawnego wykonania."""
     @functools.wraps(func)
     def wrapper(*args,**kwargs):
